@@ -44,11 +44,11 @@ import javax.microedition.lcdui.*;
 //#MIDP_EXCLUDE_BEGIN
 public class Start extends MicroBoot {
   public static void main(String args[]) {
-  	MicroBoot.main(args);
-  	NickNameDlg dlg = new NickNameDlg("Chat");
-  }
-	
-  private static class NickNameDlg extends Frame implements ActionListener {
+		MicroBoot.main(args);
+		NickNameDlg dlg = new NickNameDlg("Chat");
+	}
+
+	private static class NickNameDlg extends Frame implements ActionListener {
   	private TextField nameTf;
   	private TextArea msgTa;
   	

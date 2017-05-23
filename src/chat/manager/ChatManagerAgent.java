@@ -57,17 +57,17 @@ import java.util.Iterator;
 
 import chat.ontology.*;
 
-/**
-   This agent maintains knowledge of agents currently attending the 
-   chat and inform them when someone joins/leaves the chat.
-   @author Giovanni Caire - TILAB
- */
+
 public class ChatManagerAgent extends Agent implements SubscriptionManager {
 	private Map<AID, Subscription> participants = new HashMap<AID, Subscription>();
+	private Map<AID, String> participatingAgents = new HashMap<>();
+	private String USER = "USER_AGENT";
+	private String POLICE = "POLICE_AGENT";
+	private String FIRE_DEPARTMENT = "FIRE_AGENT";
 	private Codec codec = new SLCodec();
 	private Ontology onto = ChatOntology.getInstance();
 	private AMSSubscriber myAMSSubscriber;
-
+	// These strings below will define the types of agents that can connect to our system
 	protected void setup() {
 		// Prepare to accept subscriptions from chat participants
 		getContentManager().registerLanguage(codec);
@@ -116,9 +116,12 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager {
 	///////////////////////////////////////////////
 	// SubscriptionManager interface implementation
 	///////////////////////////////////////////////
-	public boolean register(Subscription s) throws RefuseException, NotUnderstoodException { 
+	public boolean register(Subscription s) throws RefuseException, NotUnderstoodException {
+		String agentType = "";
+		String agentName = "";
 		try {
 			AID newId = s.getMessage().getSender();
+			agentType = s.getMessage().getContent();
 			// Notify the new participant about the others (if any) and VV
 			if (!participants.isEmpty()) {
 				// The message for the new participant
@@ -127,12 +130,14 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager {
 
 				// The message for the old participants.
 				// NOTE that the message is the same for all receivers (a part from the
-				// conversation-id that will be automatically adjusted by Subscription.notify()) 
+				// conversation-id that will be automatically adjusted by Subscription.notify())
 				// --> Prepare it only once outside the loop
 				ACLMessage notif2 = (ACLMessage) notif1.clone();
 				notif2.clearAllReceiver();
 				Joined joined = new Joined();
 				List<AID> who = new ArrayList<AID>(1);
+				agentName = newId.getName();
+				newId.setName(newId.getName() + "_" + agentType);
 				who.add(newId);
 				joined.setWho(who);
 				getContentManager().fillContent(notif2, joined);
@@ -146,16 +151,18 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager {
 					Subscription oldS = (Subscription) participants.get(oldId);
 					oldS.notify(notif2);
 					
-					who.add(oldId);
+					who.add(oldId); // TODO remove this, it isn't even used in this loop?
 				}
 
 				// Notify new participant
 				getContentManager().fillContent(notif1, joined);
 				s.notify(notif1);
+				newId.setName(agentName);
 			}
 			
 			// Add the new subscription
 			participants.put(newId, s);
+			participatingAgents.put(newId, agentType);
 			return false;
 		}
 		catch (Exception e) {
