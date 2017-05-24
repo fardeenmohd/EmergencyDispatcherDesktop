@@ -144,6 +144,7 @@ public class ChatClientAgent extends Agent {
 			subscription.setOntology(onto.getName());
 			subscription.setContent(clientType);
 			String convId = "C-" + myAgent.getLocalName();
+			subscription.setContent("User");
 			subscription.setConversationId(convId);
 			subscription
 					.addReceiver(new AID(CHAT_MANAGER_NAME, AID.ISLOCALNAME));
