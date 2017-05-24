@@ -23,7 +23,11 @@ Boston, MA  02111-1307, USA.
 
 package chat.client.agent;
 
+import chat.manager.ChatManagerAgent;
+import chat.ontology.Joined;
+import chat.ontology.Left;
 import jade.content.ContentManager;
+import jade.content.Predicate;
 import jade.content.abs.AbsAggregate;
 import jade.content.abs.AbsConcept;
 import jade.content.abs.AbsPredicate;
@@ -42,6 +46,7 @@ import jade.util.leap.Iterator;
 import jade.util.leap.Set;
 import jade.util.leap.SortedSetImpl;
 import chat.client.ChatGui;
+import chat.manager.ChatManagerAgent;
 /*#MIDP_INCLUDE_BEGIN
 import chat.client.MIDPChatGui;
 #MIDP_INCLUDE_END*/
@@ -49,6 +54,8 @@ import chat.client.MIDPChatGui;
 import chat.client.AWTChatGui;
 //#MIDP_EXCLUDE_END
 import chat.ontology.ChatOntology;
+
+import java.util.List;
 
 /**
  * This agent implements the logic of the chat client running on the user
@@ -76,7 +83,8 @@ public class ChatClientAgent extends Agent {
 	private Codec codec = new SLCodec();
 	private Ontology onto = ChatOntology.getInstance();
 	private ACLMessage spokenMsg;
-
+	private java.util.HashMap<AID,String> participantAgents = new java.util.HashMap<>();
+	private String clientType = ChatManagerAgent.POLICE;
 	protected void setup() {
 		// Register language and ontology
 		ContentManager cm = getContentManager();
@@ -134,6 +142,7 @@ public class ChatClientAgent extends Agent {
 			ACLMessage subscription = new ACLMessage(ACLMessage.SUBSCRIBE);
 			subscription.setLanguage(codec.getName());
 			subscription.setOntology(onto.getName());
+			subscription.setContent(clientType);
 			String convId = "C-" + myAgent.getLocalName();
 			subscription.setConversationId(convId);
 			subscription
@@ -151,36 +160,32 @@ public class ChatClientAgent extends Agent {
 			if (msg != null) {
 				if (msg.getPerformative() == ACLMessage.INFORM) {
 					try {
-						AbsPredicate p = (AbsPredicate) myAgent
-							.getContentManager().extractAbsContent(msg);
-						if (p.getTypeName().equals(ChatOntology.JOINED)) {
-							// Get new participants, add them to the list of
-							// participants and notify the gui
-							AbsAggregate agg = (AbsAggregate) p
-									.getAbsTerm(ChatOntology.JOINED_WHO);
-							if (agg != null) {
-								Iterator it = agg.iterator();
-								while (it.hasNext()) {
-									AbsConcept c = (AbsConcept) it.next();
-									participants.add(BasicOntology
-											.getInstance().toObject(c));
-								}
+						Predicate p = (Predicate) myAgent.getContentManager().extractContent(msg);
+						if(p instanceof Joined) {
+							Joined joined = (Joined) p;
+							List<AID> aid = (List<AID>) joined.getWho();
+							for(AID a : aid)
+							{
+								String[] codedMsg = a.getName().split("_");
+								String agentName = codedMsg[0];
+								String agentType = codedMsg[1];
+								logger.log(Logger.INFO,agentName + agentType);
+								a.setName(agentName);
+								participantAgents.put(a,agentType);
+								participants.add(a);
 							}
+
 							notifyParticipantsChanged();
 						}
-						if (p.getTypeName().equals(ChatOntology.LEFT)) {
-							// Get old participants, remove them from the list
-							// of participants and notify the gui
-							AbsAggregate agg = (AbsAggregate) p
-									.getAbsTerm(ChatOntology.JOINED_WHO);
-							if (agg != null) {
-								Iterator it = agg.iterator();
-								while (it.hasNext()) {
-									AbsConcept c = (AbsConcept) it.next();
-									participants.remove(BasicOntology
-											.getInstance().toObject(c));
-								}
+						if(p instanceof Left) {
+							Left left = (Left) p;
+							List<AID> aid = (List<AID>) left.getWho();
+							for(AID a : aid)
+							{
+								participants.remove(a);
+								participantAgents.remove(a);
 							}
+
 							notifyParticipantsChanged();
 						}
 					} catch (Exception e) {
@@ -265,7 +270,7 @@ public class ChatClientAgent extends Agent {
 		int i = 0;
 		while (it.hasNext()) {
 			AID id = (AID) it.next();
-			pp[i++] = id.getLocalName();
+			pp[i++] = id.getLocalName() + "_" + participantAgents.get(id);
 		}
 		return pp;
 	}

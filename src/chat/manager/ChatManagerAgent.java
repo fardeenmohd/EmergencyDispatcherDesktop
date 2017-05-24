@@ -61,9 +61,9 @@ import chat.ontology.*;
 public class ChatManagerAgent extends Agent implements SubscriptionManager {
 	private Map<AID, Subscription> participants = new HashMap<AID, Subscription>();
 	private Map<AID, String> participatingAgents = new HashMap<>();
-	private String USER = "USER_AGENT";
-	private String POLICE = "POLICE_AGENT";
-	private String FIRE_DEPARTMENT = "FIRE_AGENT";
+	public static final String USER = "USER";
+	public static final String POLICE = "POLICE";
+	//public static final String FIRE_DEPARTMENT = "FIRE";
 	private Codec codec = new SLCodec();
 	private Ontology onto = ChatOntology.getInstance();
 	private AMSSubscriber myAMSSubscriber;
@@ -134,28 +134,34 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager {
 				// --> Prepare it only once outside the loop
 				ACLMessage notif2 = (ACLMessage) notif1.clone();
 				notif2.clearAllReceiver();
-				Joined joined = new Joined();
-				List<AID> who = new ArrayList<AID>(1);
+				Joined whoHasJustJoined = new Joined();
+				Joined whoHasAlreadyJoined = new Joined();
+				List<AID> whoHasJustConnected = new ArrayList<AID>(1);
+				List<AID> whoHasAlreadyConnected = new ArrayList<AID>(1);
 				agentName = newId.getName();
 				newId.setName(newId.getName() + "_" + agentType);
-				who.add(newId);
-				joined.setWho(who);
-				getContentManager().fillContent(notif2, joined);
+				whoHasJustConnected.add(newId);
+				whoHasJustJoined.setWho(whoHasJustConnected);
+				getContentManager().fillContent(notif2, whoHasJustJoined);
 
-				who.clear();
+				//whoHasJustConnected.clear();
 				Iterator<AID> it = participants.keySet().iterator();
 				while (it.hasNext()) {
 					AID oldId = it.next();
-					
+					AID copyOfOldId = new AID();
 					// Notify old participant
 					Subscription oldS = (Subscription) participants.get(oldId);
+					String oldAgentType = participatingAgents.get(oldId);
+					String oldAgentName = oldId.getName();
+					copyOfOldId.setName(oldAgentName + "_" + oldAgentType);
+					System.out.println("Notifying old client with message: " + notif2.getContent());
 					oldS.notify(notif2);
-					
-					who.add(oldId); // TODO remove this, it isn't even used in this loop?
+					whoHasAlreadyConnected.add(copyOfOldId);
 				}
-
+				whoHasAlreadyJoined.setWho(whoHasAlreadyConnected);
 				// Notify new participant
-				getContentManager().fillContent(notif1, joined);
+				getContentManager().fillContent(notif1, whoHasAlreadyJoined);
+				System.out.println("Notifying new client with message: " + notif1.getContent());
 				s.notify(notif1);
 				newId.setName(agentName);
 			}
@@ -163,6 +169,7 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager {
 			// Add the new subscription
 			participants.put(newId, s);
 			participatingAgents.put(newId, agentType);
+			System.out.println("New agent with name " + newId.getName() + " and type " + agentType + " has subscribed");
 			return false;
 		}
 		catch (Exception e) {
