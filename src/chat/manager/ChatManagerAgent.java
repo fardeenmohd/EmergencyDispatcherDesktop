@@ -61,9 +61,8 @@ import chat.ontology.*;
 public class ChatManagerAgent extends Agent implements SubscriptionManager {
 	private Map<AID, Subscription> participants = new HashMap<AID, Subscription>();
 	private Map<AID, String> participatingAgents = new HashMap<>();
-	public static final String USER = "USER";
-	public static final String POLICE = "POLICE";
-	//public static final String FIRE_DEPARTMENT = "FIRE";
+	public static final String USER = "User";
+	public static final String POLICE = "Police";
 	private Codec codec = new SLCodec();
 	private Ontology onto = ChatOntology.getInstance();
 	private AMSSubscriber myAMSSubscriber;
