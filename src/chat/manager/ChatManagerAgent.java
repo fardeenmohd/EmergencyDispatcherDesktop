@@ -138,7 +138,7 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager {
 				List<AID> whoHasJustConnected = new ArrayList<AID>(1);
 				List<AID> whoHasAlreadyConnected = new ArrayList<AID>(1);
 				agentName = newId.getName();
-				newId.setName(newId.getName() + "_" + agentType);
+				newId.setName(agentName + "_" + agentType);
 				whoHasJustConnected.add(newId);
 				whoHasJustJoined.setWho(whoHasJustConnected);
 				getContentManager().fillContent(notif2, whoHasJustJoined);
