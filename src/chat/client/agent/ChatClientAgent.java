@@ -144,7 +144,6 @@ public class ChatClientAgent extends Agent {
 			subscription.setOntology(onto.getName());
 			subscription.setContent(clientType);
 			String convId = "C-" + myAgent.getLocalName();
-			subscription.setContent("User");
 			subscription.setConversationId(convId);
 			subscription
 					.addReceiver(new AID(CHAT_MANAGER_NAME, AID.ISLOCALNAME));
@@ -219,13 +218,11 @@ public class ChatClientAgent extends Agent {
 		public void action() {
 			ACLMessage msg = myAgent.receive(template);
 			if (msg != null) {
-				if (msg.getPerformative() == ACLMessage.INFORM) {
+				System.out.println("Got message from: " + msg.getSender() + " with content: " + msg.getContent());
 					notifySpoken(msg.getSender().getLocalName(),
 							msg.getContent());
-				} else {
-					handleUnexpected(msg);
-				}
-			} else {
+			}
+			else {
 				block();
 			}
 		}
@@ -252,7 +249,12 @@ public class ChatClientAgent extends Agent {
 			}
 			spokenMsg.setContent(sentence);
 			notifySpoken(myAgent.getLocalName(), sentence);
+			if(sentence.contains("REQUESTING")){
+				//for testing purposes
+				spokenMsg.setPerformative(ACLMessage.REQUEST);
+			}
 			send(spokenMsg);
+			spokenMsg.setPerformative(ACLMessage.INFORM);
 		}
 	} // END of inner class ChatSpeaker
 
