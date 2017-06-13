@@ -28,6 +28,7 @@ package chat.manager;
 import jade.core.Agent;
 import jade.core.AID;
 
+import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -104,6 +105,7 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager {
 			}
 		};
 		addBehaviour(myAMSSubscriber);
+		addBehaviour(new ReceiveMessageBehavior());
 	}
 
 	protected void takeDown() {
@@ -111,7 +113,19 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager {
 		send(myAMSSubscriber.getCancel());
 		//FIXME: should inform current participants if any
 	}
+	private class ReceiveMessageBehavior extends CyclicBehaviour{
 
+		@Override
+		public void action() {
+			ACLMessage msg = receive();
+			if(msg != null){
+				System.out.println("Manager received message: " + msg);
+			}
+			else{
+				block();
+			}
+		}
+	}
 	///////////////////////////////////////////////
 	// SubscriptionManager interface implementation
 	///////////////////////////////////////////////

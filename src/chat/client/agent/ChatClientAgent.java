@@ -253,6 +253,9 @@ public class ChatClientAgent extends Agent {
 				//for testing purposes
 				spokenMsg.setPerformative(ACLMessage.REQUEST);
 			}
+			else if(sentence.contains("Helpaccepted")){
+				spokenMsg.setPerformative(ACLMessage.AGREE);
+			}
 			send(spokenMsg);
 			spokenMsg.setPerformative(ACLMessage.INFORM);
 		}
