@@ -22,31 +22,24 @@
  * Boston, MA  02111-1307, USA.
  * **************************************************************
  */
-package chat.ontology;
+package EmergencyDesktopAgents.ontology;
 
 import jade.content.onto.*;
 import jade.content.schema.*;
-import jade.content.abs.*;
 
-/**
- * Ontology containing concepts, predicates and actions used within the chat
- * application.
- * 
- * @author Giovanni Caire - TILAB
- */
-public class ChatOntology extends Ontology implements ChatVocabulary {
+public class Ontology extends jade.content.onto.Ontology implements Vocabulary {
 
 	// The singleton instance of this ontology
-	private static Ontology theInstance = new ChatOntology();
+	private static jade.content.onto.Ontology theInstance = new Ontology();
 
-	public static Ontology getInstance() {
+	public static jade.content.onto.Ontology getInstance() {
 		return theInstance;
 	}
 
 	/**
 	 * Constructor
 	 */
-	private ChatOntology() {
+	private Ontology() {
 		//#PJAVA_EXCLUDE_BEGIN
 		/*#J2ME_INCLUDE_BEGIN
 		//#PJAVA_EXCLUDE_END
@@ -64,8 +57,8 @@ public class ChatOntology extends Ontology implements ChatVocabulary {
 
 		try {
 			add(new PredicateSchema(JOINED), Joined.class);
-			add(new PredicateSchema(LEFT), Left.class);
-			add(new PredicateSchema(SPOKEN), Spoken.class);
+			add(new PredicateSchema(LEFT), EmergencyDesktopAgents.ontology.Left.class);
+			add(new PredicateSchema(SPOKEN), EmergencyDesktopAgents.ontology.Spoken.class);
 		//#J2ME_EXCLUDE_END
 			PredicateSchema ps = (PredicateSchema) getSchema(JOINED);
 			ps.add(JOINED_WHO, (ConceptSchema) getSchema(BasicOntology.AID), 1, ObjectSchema.UNLIMITED);

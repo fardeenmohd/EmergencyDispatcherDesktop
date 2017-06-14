@@ -1,5 +1,5 @@
 
-package chat.client;
+package EmergencyDesktopAgents.TestClients;
 
 import java.awt.*;
 import java.awt.event.*;

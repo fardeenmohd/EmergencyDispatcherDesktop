@@ -1,18 +1,16 @@
 
-package chat.client;
+package EmergencyDesktopAgents.TestClients;
 
 import java.awt.*;
 import java.awt.event.*;
 
-import chat.client.agent.ChatClientAgent;
-
 public class AWTChatGui extends Frame implements ChatGui {
-	private ChatClientAgent myAgent;
+	private EmergencyDesktopAgents.TestClients.agent.ChatClientAgent myAgent;
 	private TextField writeTf;
 	private TextArea allTa;
 	private ParticipantsFrame participantsFrame;
 	
-	public AWTChatGui(ChatClientAgent a) {
+	public AWTChatGui(EmergencyDesktopAgents.TestClients.agent.ChatClientAgent a) {
 		myAgent = a;
 		
 		setTitle("Chat: "+myAgent.getLocalName());

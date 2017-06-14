@@ -1,30 +1,9 @@
-/*****************************************************************
-JADE - Java Agent DEvelopment Framework is a framework to develop 
-multi-agent systems in compliance with the FIPA specifications.
-Copyright (C) 2000 CSELT S.p.A. 
 
-GNU Lesser General Public License
+package EmergencyDesktopAgents.manager;
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation, 
-version 2.1 of the License. 
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the
-Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA  02111-1307, USA.
- *****************************************************************/
-
-package chat.manager;
-
-//#J2ME_EXCLUDE_FILE
-
+import EmergencyDesktopAgents.ontology.*;
 import jade.core.Agent;
 import jade.core.AID;
 
@@ -34,7 +13,6 @@ import jade.lang.acl.MessageTemplate;
 
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
-import jade.content.onto.Ontology;
 import jade.content.onto.BasicOntology;
 import jade.content.abs.*;
 
@@ -56,16 +34,14 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import chat.ontology.*;
 
-
-public class ChatManagerAgent extends Agent implements SubscriptionManager {
+public class EmergencyManagerAgent extends Agent implements SubscriptionManager {
 	private Map<AID, Subscription> participants = new HashMap<AID, Subscription>();
 	private Map<AID, String> participatingAgents = new HashMap<>();
 	public static final String USER = "User";
 	public static final String POLICE = "Police";
 	private Codec codec = new SLCodec();
-	private Ontology onto = ChatOntology.getInstance();
+	private jade.content.onto.Ontology onto = Ontology.getInstance();
 	private AMSSubscriber myAMSSubscriber;
 	// These strings below will define the types of agents that can connect to our system
 	protected void setup() {
@@ -147,8 +123,8 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager {
 				// --> Prepare it only once outside the loop
 				ACLMessage notif2 = (ACLMessage) notif1.clone();
 				notif2.clearAllReceiver();
-				Joined whoHasJustJoined = new Joined();
-				Joined whoHasAlreadyJoined = new Joined();
+				EmergencyDesktopAgents.ontology.Joined whoHasJustJoined = new EmergencyDesktopAgents.ontology.Joined();
+				EmergencyDesktopAgents.ontology.Joined whoHasAlreadyJoined = new EmergencyDesktopAgents.ontology.Joined();
 				List<AID> whoHasJustConnected = new ArrayList<AID>(1);
 				List<AID> whoHasAlreadyConnected = new ArrayList<AID>(1);
 				agentName = newId.getName();
@@ -167,14 +143,14 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager {
 					String oldAgentType = participatingAgents.get(oldId);
 					String oldAgentName = oldId.getName();
 					copyOfOldId.setName(oldAgentName + "_" + oldAgentType);
-					System.out.println("Notifying old client with message: " + notif2.getContent());
+					System.out.println("Notifying old TestClients with message: " + notif2.getContent());
 					oldS.notify(notif2);
 					whoHasAlreadyConnected.add(copyOfOldId);
 				}
 				whoHasAlreadyJoined.setWho(whoHasAlreadyConnected);
 				// Notify new participant
 				getContentManager().fillContent(notif1, whoHasAlreadyJoined);
-				System.out.println("Notifying new client with message: " + notif1.getContent());
+				System.out.println("Notifying new TestClients with message: " + notif1.getContent());
 				s.notify(notif1);
 				newId.setName(agentName);
 			}
@@ -201,10 +177,10 @@ public class ChatManagerAgent extends Agent implements SubscriptionManager {
 					ACLMessage notif = s.getMessage().createReply();
 					notif.setPerformative(ACLMessage.INFORM);
 					notif.clearAllReceiver();
-					AbsPredicate p = new AbsPredicate(ChatOntology.LEFT);
+					AbsPredicate p = new AbsPredicate(Ontology.LEFT);
 					AbsAggregate agg = new AbsAggregate(BasicOntology.SEQUENCE);
 					agg.add((AbsTerm) BasicOntology.getInstance().fromObject(oldId));
-					p.set(ChatOntology.LEFT_WHO, agg);
+					p.set(Ontology.LEFT_WHO, agg);
 					getContentManager().fillContent(notif, p);
 
 					Iterator it = participants.values().iterator();

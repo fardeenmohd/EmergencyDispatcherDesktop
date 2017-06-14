@@ -1,4 +1,4 @@
-package chat.ontology;
+package EmergencyDesktopAgents.ontology;
 
 import java.util.List;
 
@@ -6,12 +6,6 @@ import jade.content.Predicate;
 import jade.core.AID;
 
 //#J2ME_EXCLUDE_FILE
-
-/**
- * Left predicate used by chat ontology.
- * 
- * @author Michele Izzo - Telecomitalia
- */
 
 @SuppressWarnings("serial")
 public class Left implements Predicate {

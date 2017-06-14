@@ -1,5 +1,5 @@
 
-package chat.client;
+package EmergencyDesktopAgents.TestClients;
 
 
 public interface ChatGui {

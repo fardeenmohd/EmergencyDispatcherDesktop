@@ -1,10 +1,8 @@
 
-package chat.client;
+package EmergencyDesktopAgents.TestClients;
 
 import jade.MicroBoot;
 import jade.core.MicroRuntime;
-import jade.core.Agent;
-import jade.util.leap.Properties;
 
 //#MIDP_EXCLUDE_BEGIN
 import java.awt.*;
@@ -54,7 +52,7 @@ public class Start extends MicroBoot {
 	  	}
 	  	else {
 	  		try {
-	    		MicroRuntime.startAgent(name, "chat.client.agent.ChatClientAgent", null);
+	    		MicroRuntime.startAgent(name, "ChatClientAgent", null);
 	    		dispose();
     		}
     		catch (Exception ex) {
